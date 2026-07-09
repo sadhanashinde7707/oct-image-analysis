@@ -1,55 +1,48 @@
 # app.py
-# OCT Image Analysis Pipeline - Test Segmentation
-
 import numpy as np
-import cv2
 from pathlib import Path
 from src.datasets import OCTDataset
-from src.preprocessing import OCTPreprocessor
-from src.segmentation import OCTSegmenter
+from src.features import FeatureExtractor
 
 print("=" * 70)
 print("OCT IMAGE ANALYSIS PIPELINE")
-print("Testing Retinal Layer Segmentation")
+print("Testing Feature Extraction")
 print("=" * 70)
 
-# Initialize dataset
 data_path = Path("data/OCT2017 ")
 dataset = OCTDataset(data_path)
 
-print("\n✓ Loading sample images from each disease category...")
-images, labels, disease_names = dataset.load_all_images(split='train', max_images=4)
+print("\nLoading 8 sample images...")
+images, labels, disease_names = dataset.load_all_images(split='train', max_images=8)
 
-print(f"✓ Loaded {len(images)} images")
+print(f"Loaded {len(images)} images")
 
-# Test segmentation on each image
-preprocessor = OCTPreprocessor()
-segmenter = OCTSegmenter()
+feature_extractor = FeatureExtractor()
+all_features = []
 
 print("\n" + "=" * 70)
-print("SEGMENTATION RESULTS")
+print("FEATURE EXTRACTION RESULTS")
 print("=" * 70)
 
-for idx in range(min(4, len(images))):
+for idx in range(len(images)):
     print(f"\n--- Image {idx+1}: {disease_names[idx]} ---")
+    features = feature_extractor.extract_all_features(images[idx], disease_label=labels[idx])
+    all_features.append(features)
     
-    # Get original image
-    original = images[idx]
-    
-    # Preprocess
-    preprocessed = preprocessor.preprocess_pipeline(original)
-    
-    # Segment
-    segmentation = segmenter.segment_retina(preprocessed)
-    
-    # Print results
-    print(f"  Mean Retinal Thickness: {segmentation['mean_thickness']:.1f} pixels")
-    print(f"  Fluid Detected: {segmentation['has_fluid']}")
-    print(f"  Fluid Volume: {segmentation['fluid_volume']} pixels")
-    print(f"  ILM Range: {segmentation['ilm'].min():.0f} - {segmentation['ilm'].max():.0f}")
-    print(f"  RPE Range: {segmentation['rpe'].min():.0f} - {segmentation['rpe'].max():.0f}")
+    print(f"  THICKNESS:")
+    print(f"    Mean: {features['mean_thickness']:.1f} pixels")
+    print(f"    Std: {features['std_thickness']:.1f} pixels")
+    print(f"  INTENSITY:")
+    print(f"    Mean: {features['mean_intensity']:.1f}")
+    print(f"    Std: {features['std_intensity']:.1f}")
+    print(f"  FLUID:")
+    print(f"    Has Fluid: {bool(features['has_fluid'])}")
+    print(f"    Volume: {features['fluid_volume']:.0f} pixels")
+    print(f"  ENTROPY:")
+    print(f"    Shannon: {features['shannon_entropy']:.3f}")
 
 print("\n" + "=" * 70)
-print("✓ Segmentation pipeline working successfully!")
-print("✓ Retinal layers and abnormalities identified")
+print(f"✓ Extracted {len(all_features)} images")
+print(f"✓ Features per image: {len(all_features[0])}")
+print(f"✓ Ready for Machine Learning!")
 print("=" * 70 + "\n")
