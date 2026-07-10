@@ -30,3 +30,5 @@ Thumbs.db
 results/*.csv
 results/*.json
 INTERVIEW_PREP.md
+data/
+*.~
