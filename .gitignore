@@ -1,6 +1,31 @@
-__pycache__/
-*.pyc
+# Virtual environment
 .venv/
-.DS_Store
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
 .vscode/
-*.egg-info/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (optional - exclude large datasets)
+# data/OCT2017/
+
+# Results
+results/*.csv
+results/*.json
